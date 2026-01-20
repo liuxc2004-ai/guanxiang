@@ -6,7 +6,7 @@
     <title>观象 - 传统易理全息推演</title>
     <style>
         :root { --body-bg: #FFFFFF; --paper-bg: #F5F2E9; --ink-black: #2D2926; --cinnabar: #8B0000; --border-old: #A6937C; }
-        body { background-color: var(--body-bg); color: var(--ink-black); font-family: "STSong", "SimSun", serif; padding: 10px; display: flex; justify-content: center; margin: 0; }
+        body { background-color: var(--body-bg); color: var(--ink-black); font-family: "STSong", "SimSun", serif; padding: 10px; display: flex; flex-direction: column; align-items: center; margin: 0; }
         .container { max-width: 850px; width: 100%; background-color: var(--paper-bg); padding: 50px; border: 1px solid var(--border-old); position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.1); box-sizing: border-box; }
         .disclaimer { position: absolute; top: 25px; right: 20px; font-size: 0.8rem; color: #888; font-weight: bold; writing-mode: vertical-rl; padding-left: 8px; border-left: 1px solid var(--border-old); }
         h1 { text-align: center; color: var(--cinnabar); font-size: 2.2rem; letter-spacing: 15px; margin: 10px 0 30px 0; }
@@ -45,8 +45,11 @@
         .math-block { background: #262422; border-left: 3px solid var(--cinnabar); padding: 12px; margin-top: 10px; font-family: monospace; }
         .path-step { border-bottom: 1px solid #3d3a36; padding: 4px 0; display: block; }
 
-        /* 手机端适配关键代码 */
-        @media (max-width: 600px) {select { font-size: 0.8rem; } /* 缩小手机端下拉框字体，确保时间范围能看全 */
+        /* 统计样式 */
+        .footer-stats { margin-top: 25px; font-size: 0.75rem; color: #A6937C; letter-spacing: 1px; }
+
+        @media (max-width: 600px) {
+            select { font-size: 0.8rem; }
             .container { padding: 40px 15px 20px 15px; }
             .sensor-box, .input-row, .gua-grid, .advice-grid { grid-template-columns: 1fr !important; gap: 10px; }
             h1 { font-size: 1.6rem; letter-spacing: 6px; }
@@ -95,20 +98,20 @@
             <option value="0">正中</option><option value="1">南-离</option><option value="2">西南-坤</option><option value="3">西-兑</option><option value="4">西北-乾</option><option value="5">北-坎</option><option value="6">东北-艮</option><option value="7">东-震</option><option value="8">东南-巽</option>
         </select></div>
         <div><label>时辰校正</label><select id="timeSelect">
-    <option value="0">自动 (按当前系统时间)</option>
-    <option value="1">子时 (23:00-01:00)</option>
-    <option value="2">丑时 (01:00-03:00)</option>
-    <option value="3">寅时 (03:00-05:00)</option>
-    <option value="4">卯时 (05:00-07:00)</option>
-    <option value="5">辰时 (07:00-09:00)</option>
-    <option value="6">巳时 (09:00-11:00)</option>
-    <option value="7">午时 (11:00-13:00)</option>
-    <option value="8">未时 (13:00-15:00)</option>
-    <option value="9">申时 (15:00-17:00)</option>
-    <option value="10">酉时 (17:00-19:00)</option>
-    <option value="11">戌时 (19:00-21:00)</option>
-    <option value="12">亥时 (21:00-23:00)</option>
-</select></div>
+            <option value="0">自动 (按当前系统时间)</option>
+            <option value="1">子时 (23:00-01:00)</option>
+            <option value="2">丑时 (01:00-03:00)</option>
+            <option value="3">寅时 (03:00-05:00)</option>
+            <option value="4">卯时 (05:00-07:00)</option>
+            <option value="5">辰时 (07:00-09:00)</option>
+            <option value="6">巳时 (09:00-11:00)</option>
+            <option value="7">午时 (11:00-13:00)</option>
+            <option value="8">未时 (13:00-15:00)</option>
+            <option value="9">申时 (15:00-17:00)</option>
+            <option value="10">酉时 (17:00-19:00)</option>
+            <option value="11">戌时 (19:00-21:00)</option>
+            <option value="12">亥时 (21:00-23:00)</option>
+        </select></div>
     </div>
     
     <button type="button" id="btnRun">开启全息推演</button>
@@ -125,6 +128,10 @@
     </div>
 </div>
 
+<div class="footer-stats">
+    —— 已累计进行全息感应 <span id="countDisplay">0</span> 次 ——
+</div>
+
 <script>
     const GUA_DATA = { "乾":[1,1,1,"金","天","自强不息"], "兑":[0,1,1,"金","泽","喜悦随和"], "离":[1,0,1,"火","火","光明美丽"], "震":[1,0,0,"木","雷","奋起振作"], "巽":[0,1,1,"木","风","谦逊渗透"], "坎":[0,1,0,"水","水","陷险防阻"], "艮":[0,0,1,"土","山","静止持重"], "坤":[0,0,0,"土","地","厚德载物"] };
     const GUA_LIST = ["坤", "乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
@@ -139,6 +146,12 @@
         "用克体": { c: "局势受困，恐有压力阻碍。宜守不宜进。", w: "求财受阻，严重者损财。严禁投机。", l: "缘分薄弱，沟通易生龃龉。防外界干扰。", h: "病邪侵扰，防患未然。注意五脏健康。" }
     };
 
+    // 统计逻辑：初始化显示
+    function initStats() {
+        let count = localStorage.getItem('gx_push_count') || 0;
+        document.getElementById('countDisplay').innerText = count;
+    }
+
     function updateTime() {
         const now = new Date();
         const zhiIdx = (Math.floor((now.getHours() + 1) / 2) % 12) + 1;
@@ -148,6 +161,7 @@
     }
     let currentAutoZhi = updateTime();
     setInterval(updateTime, 1000);
+    initStats(); // 页面加载时执行统计初始化
 
     function renderGua(containerId, yaos, moveIdx = -1) {
         const container = document.getElementById(containerId); container.innerHTML = '';
@@ -165,6 +179,12 @@
         const rawVal = document.getElementById('inputVal').value;
         if (!rawVal) { alert("请先输入感应参数数字。"); return; }
         
+        // 统计逻辑：增加次数并保存
+        let count = parseInt(localStorage.getItem('gx_push_count') || 0);
+        count++;
+        localStorage.setItem('gx_push_count', count);
+        document.getElementById('countDisplay').innerText = count;
+
         const userNum = Number(rawVal);
         let textEnergy = 0;
         const userText = (document.getElementById('soundN').value || "").trim();
@@ -224,3 +244,4 @@
 </script>
 </body>
 </html>
+
