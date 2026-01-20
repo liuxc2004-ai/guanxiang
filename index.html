@@ -9,7 +9,11 @@
         body { background-color: var(--body-bg); color: var(--ink-black); font-family: "STSong", "SimSun", serif; padding: 10px; display: flex; flex-direction: column; align-items: center; margin: 0; }
         .container { max-width: 850px; width: 100%; background-color: var(--paper-bg); padding: 50px; border: 1px solid var(--border-old); position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.1); box-sizing: border-box; }
         .disclaimer { position: absolute; top: 25px; right: 20px; font-size: 0.8rem; color: #888; font-weight: bold; writing-mode: vertical-rl; padding-left: 8px; border-left: 1px solid var(--border-old); }
-        h1 { text-align: center; color: var(--cinnabar); font-size: 2.2rem; letter-spacing: 15px; margin: 10px 0 30px 0; }
+        h1 { text-align: center; color: var(--cinnabar); font-size: 2.2rem; letter-spacing: 15px; margin: 10px 0 10px 0; }
+        
+        /* 统计样式 - 放置在标题下方 */
+        .header-stats { text-align: center; font-size: 0.85rem; color: #A6937C; letter-spacing: 2px; margin-bottom: 30px; font-style: italic; }
+
         .guide-box { background: rgba(255, 255, 255, 0.4); border: 1px dashed var(--border-old); padding: 15px; margin-bottom: 25px; }
         .guide-title { font-weight: bold; font-size: 0.95rem; color: var(--cinnabar); margin-bottom: 5px; display: block; }
         .guide-content { font-size: 0.85rem; color: #543; line-height: 1.6; }
@@ -45,9 +49,6 @@
         .math-block { background: #262422; border-left: 3px solid var(--cinnabar); padding: 12px; margin-top: 10px; font-family: monospace; }
         .path-step { border-bottom: 1px solid #3d3a36; padding: 4px 0; display: block; }
 
-        /* 统计样式 */
-        .footer-stats { margin-top: 25px; font-size: 0.75rem; color: #A6937C; letter-spacing: 1px; }
-
         @media (max-width: 600px) {
             select { font-size: 0.8rem; }
             .container { padding: 40px 15px 20px 15px; }
@@ -65,11 +66,15 @@
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
     
+    <div class="header-stats">
+        —— 累计全息感应 <span id="countDisplay">...</span> 次 ——
+    </div>
+    
     <div class="guide-box">
         <span class="guide-title">观象指引：</span>
         <div class="guide-content">
             1. 静心：深呼吸，于心中默念所问之事。<br>
-            2. <span class="must">感应参数</span>：输入1-100间的直觉数字。<br>
+            2. <span class="must">感应参数</span>：输入1-100间的直觉数字。（必填）<br>
             3. <span class="must">物感/方位</span>：可录入眼前景物或时空方位。
         </div>
     </div>
@@ -128,10 +133,6 @@
     </div>
 </div>
 
-<div class="footer-stats">
-    —— 已累计进行全息感应 <span id="countDisplay">...</span> 次 ——
-</div>
-
 <script>
     const GUA_DATA = { "乾":[1,1,1,"金","天","自强不息"], "兑":[0,1,1,"金","泽","喜悦随和"], "离":[1,0,1,"火","火","光明美丽"], "震":[1,0,0,"木","雷","奋起振作"], "巽":[0,1,1,"木","风","谦逊渗透"], "坎":[0,1,0,"水","水","陷险防阻"], "艮":[0,0,1,"土","山","静止持重"], "坤":[0,0,0,"土","地","厚德载物"] };
     const GUA_LIST = ["坤", "乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
@@ -146,10 +147,8 @@
         "用克体": { c: "局势受困，恐有压力阻碍。宜守不宜进。", w: "求财受阻，严重者损财。严禁投机。", l: "缘分薄弱，沟通易生龃龉。防外界干扰。", h: "病邪侵扰，防患未然。注意五脏健康。" }
     };
 
-    // 全网统计 API 地址 (使用专门的公开计数服务)
     const statsUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
 
-    // 统计逻辑：获取并显示当前全网总数
     async function getStats() {
         try {
             const response = await fetch(statsUrl);
@@ -160,7 +159,6 @@
         }
     }
 
-    // 统计逻辑：增加全网总数
     async function addStats() {
         try {
             const response = await fetch(statsUrl + "/up");
@@ -178,7 +176,7 @@
     }
     let currentAutoZhi = updateTime();
     setInterval(updateTime, 1000);
-    getStats(); // 初始化显示
+    getStats();
 
     function renderGua(containerId, yaos, moveIdx = -1) {
         const container = document.getElementById(containerId); container.innerHTML = '';
@@ -196,7 +194,6 @@
         const rawVal = document.getElementById('inputVal').value;
         if (!rawVal) { alert("请先输入感应参数数字。"); return; }
         
-        // 统计逻辑：点击后云端计数器 +1
         addStats();
 
         const userNum = Number(rawVal);
