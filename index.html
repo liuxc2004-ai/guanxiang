@@ -129,7 +129,7 @@
 </div>
 
 <div class="footer-stats">
-    —— 已累计进行全息感应 <span id="countDisplay">0</span> 次 ——
+    —— 已累计进行全息感应 <span id="countDisplay">...</span> 次 ——
 </div>
 
 <script>
@@ -146,10 +146,27 @@
         "用克体": { c: "局势受困，恐有压力阻碍。宜守不宜进。", w: "求财受阻，严重者损财。严禁投机。", l: "缘分薄弱，沟通易生龃龉。防外界干扰。", h: "病邪侵扰，防患未然。注意五脏健康。" }
     };
 
-    // 统计逻辑：初始化显示
-    function initStats() {
-        let count = localStorage.getItem('gx_push_count') || 0;
-        document.getElementById('countDisplay').innerText = count;
+    // 全网统计 API 地址 (使用专门的公开计数服务)
+    const statsUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
+
+    // 统计逻辑：获取并显示当前全网总数
+    async function getStats() {
+        try {
+            const response = await fetch(statsUrl);
+            const data = await response.json();
+            document.getElementById('countDisplay').innerText = data.count;
+        } catch (e) {
+            document.getElementById('countDisplay').innerText = "1";
+        }
+    }
+
+    // 统计逻辑：增加全网总数
+    async function addStats() {
+        try {
+            const response = await fetch(statsUrl + "/up");
+            const data = await response.json();
+            document.getElementById('countDisplay').innerText = data.count;
+        } catch (e) {}
     }
 
     function updateTime() {
@@ -161,7 +178,7 @@
     }
     let currentAutoZhi = updateTime();
     setInterval(updateTime, 1000);
-    initStats(); // 页面加载时执行统计初始化
+    getStats(); // 初始化显示
 
     function renderGua(containerId, yaos, moveIdx = -1) {
         const container = document.getElementById(containerId); container.innerHTML = '';
@@ -179,11 +196,8 @@
         const rawVal = document.getElementById('inputVal').value;
         if (!rawVal) { alert("请先输入感应参数数字。"); return; }
         
-        // 统计逻辑：增加次数并保存
-        let count = parseInt(localStorage.getItem('gx_push_count') || 0);
-        count++;
-        localStorage.setItem('gx_push_count', count);
-        document.getElementById('countDisplay').innerText = count;
+        // 统计逻辑：点击后云端计数器 +1
+        addStats();
 
         const userNum = Number(rawVal);
         let textEnergy = 0;
@@ -244,4 +258,3 @@
 </script>
 </body>
 </html>
-
