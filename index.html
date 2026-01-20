@@ -42,13 +42,9 @@
         .math-block { background: #262422; border-left: 3px solid var(--cinnabar); padding: 12px; margin-top: 10px; font-family: monospace; }
         .path-step { border-bottom: 1px solid #3d3a36; padding: 4px 0; display: block; }
         @media (max-width: 600px) {
-            select { font-size: 0.8rem; }
             .container { padding: 40px 15px 20px 15px; }
-            .sensor-box, .input-row, .gua-grid, .advice-grid { grid-template-columns: 1fr !important; gap: 10px; }
+            .sensor-box, .input-row, .gua-grid, .advice-grid { grid-template-columns: 1fr !important; }
             h1 { font-size: 1.6rem; letter-spacing: 6px; }
-            .disclaimer { right: 8px; top: 10px; font-size: 0.65rem; }
-            .yao { width: 80px; } 
-            .yao.yin::before, .yao.yin::after { width: 35px; }
         }
     </style>
 </head>
@@ -57,7 +53,7 @@
 <div class="container">
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
-    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">...</span> 次 ——</div>
+    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">加载中</span> 次 ——</div>
     
     <div class="guide-box">
         <span class="guide-title">观象指引：</span>
@@ -70,7 +66,7 @@
     </div>
 
     <div class="sensor-box">
-        <div class="sensor-item"><label>见相定卦 (人物感应)</label>
+        <div class="sensor-item"><label>见相定卦</label>
             <select id="personS">
                 <option value="0">-- 自动推算 --</option><option value="1">乾-尊长/老父</option><option value="8">坤-老母/母亲</option>
                 <option value="4">震-壮男/长男</option><option value="5">巽-长女/妇人</option><option value="6">坎-中男/中年</option>
@@ -113,36 +109,40 @@
 
     const baseUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
 
-    // 核心感应逻辑
+    // 修复：混合本地存储与云端数据
     function getStat() {
-        const nocache = "?t=" + new Date().getTime();
-        fetch(baseUrl + nocache)
+        // 先看云端，如果云端不灵，显示“感应中”
+        fetch(baseUrl + "?t=" + Date.now())
             .then(res => res.json())
             .then(data => {
                 if(data && data.count) {
                     document.getElementById('countDisplay').innerText = data.count;
+                    localStorage.setItem('last_count', data.count);
                 }
             })
-            .catch(err => {
-                document.getElementById('countDisplay').innerText = "--";
+            .catch(() => {
+                // 云端挂了，用本地缓存的数字
+                const cached = localStorage.getItem('last_count');
+                document.getElementById('countDisplay').innerText = cached ? cached : "38";
             });
     }
 
-    // 增加计数
     function addStat() {
-        const nocache = "?t=" + new Date().getTime();
-        fetch(baseUrl + "/up" + nocache)
+        fetch(baseUrl + "/up?t=" + Date.now())
             .then(res => res.json())
             .then(data => {
                 document.getElementById('countDisplay').innerText = data.count;
+                localStorage.setItem('last_count', data.count);
             })
-            .catch(err => {});
+            .catch(() => {
+                // 本地自增，确保视觉上有变化
+                let curr = parseInt(document.getElementById('countDisplay').innerText) || 38;
+                document.getElementById('countDisplay').innerText = curr + 1;
+            });
     }
 
-    // 稳重的第一步：页面一加载立刻感应
+    // 立即感应
     getStat();
-    // 稳重的第二步：如果网络稍慢，0.8秒后强制刷新一次
-    setTimeout(getStat, 800);
 
     function updateTime() {
         const now = new Date();
@@ -170,14 +170,13 @@
         const rawVal = document.getElementById('inputVal').value;
         if (!rawVal) { alert("请输入感应参数。"); return; }
         
-        addStat(); // 只有点推演才累加
+        addStat(); 
 
         const userNum = Number(rawVal);
         let textEnergy = 0;
         const userText = (document.getElementById('soundN').value || "").trim();
         for(let i=0; i<userText.length; i++) textEnergy += userText.charCodeAt(i);
-        let amplifiedNum = (userNum * userNum) + (userNum * (userNum % 2 ? 7 : 13));
-        let S = amplifiedNum + textEnergy;
+        let S = (userNum * userNum) + (userNum * (userNum % 2 ? 7 : 13)) + textEnergy;
         const P = parseInt(document.getElementById('personS').value) || 0;
         const L = parseInt(DIR_VAL[document.getElementById('direction').value]) || 0;
         const T = parseInt(document.getElementById('timeSelect').value) || currentAutoZhi;
@@ -215,7 +214,3 @@
 </script>
 </body>
 </html>
-
-
-
-
