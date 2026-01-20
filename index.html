@@ -11,6 +11,7 @@
         .disclaimer { position: absolute; top: 25px; right: 20px; font-size: 0.8rem; color: #888; font-weight: bold; writing-mode: vertical-rl; padding-left: 8px; border-left: 1px solid var(--border-old); }
         h1 { text-align: center; color: var(--cinnabar); font-size: 2.2rem; letter-spacing: 15px; margin: 10px 0 10px 0; }
         
+        /* 统计样式 */
         .header-stats { text-align: center; font-size: 0.85rem; color: #A6937C; letter-spacing: 2px; margin-bottom: 30px; font-style: italic; min-height: 1.2em; }
 
         .guide-box { background: rgba(255, 255, 255, 0.4); border: 1px dashed var(--border-old); padding: 15px; margin-bottom: 25px; }
@@ -65,8 +66,8 @@
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
     
-    <div class="header-stats" id="statLine">
-        —— 累计全息感应 <span id="countDisplay">加载中</span> 次 ——
+    <div class="header-stats">
+        —— 累计全息感应 <span id="countDisplay">...</span> 次 ——
     </div>
     
     <div class="guide-box">
@@ -148,14 +149,15 @@
 
     const statsUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
 
-    // 修复后的加载逻辑：加载即更新
+    // 核心修复：这个函数必须能确保在拿到数据后更新 UI
     async function refreshStats() {
         try {
             const response = await fetch(statsUrl);
             const data = await response.json();
-            document.getElementById('countDisplay').innerText = data.count;
+            const countSpan = document.getElementById('countDisplay');
+            if(countSpan) countSpan.innerText = data.count;
         } catch (e) {
-            document.getElementById('countDisplay').innerText = "--";
+            console.error("统计获取失败", e);
         }
     }
 
@@ -163,7 +165,8 @@
         try {
             const response = await fetch(statsUrl + "/up");
             const data = await response.json();
-            document.getElementById('countDisplay').innerText = data.count;
+            const countSpan = document.getElementById('countDisplay');
+            if(countSpan) countSpan.innerText = data.count;
         } catch (e) {}
     }
 
@@ -176,9 +179,6 @@
     }
     let currentAutoZhi = updateTime();
     setInterval(updateTime, 1000);
-    
-    // 页面初始化时立即调用
-    refreshStats();
 
     function renderGua(containerId, yaos, moveIdx = -1) {
         const container = document.getElementById(containerId); container.innerHTML = '';
@@ -254,7 +254,11 @@
             </div>`;
         document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
     };
+
+    // 页面加载完毕后，立即尝试获取一次统计数据
+    window.onload = refreshStats;
 </script>
 </body>
 </html>
+
 
