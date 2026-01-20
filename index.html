@@ -57,11 +57,11 @@
 <div class="container">
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
-    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">...</span> 次 ——</div>
+    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">1</span> 次 ——</div>
     
     <div class="guide-box">
         <span class="guide-title">观象指引：</span>
-        <div class="guide-content">1. 静心：深呼吸，于心中默念所问之事。<br>2. <span class="must">感应参数</span>：输入1-100间的直觉数字。（必填）<br>3. <span class="must">物感/方位</span>：可录入眼前景物或时空方位。</div>
+        <div class="guide-content">1. 静心：深呼吸，于心中默念所问之事。<br>2. <span class="must">感应参数</span>：输入1-100间的直觉数字。<br>3. <span class="must">物感/方位</span>：可录入眼前景物或时空方位。</div>
     </div>
 
     <div class="time-sync-bar">
@@ -111,30 +111,31 @@
     const DIR_VAL = [0, 3, 8, 2, 1, 6, 7, 4, 5];
     const JUDGMENTS = { "用生体": { c: "贵人垂青，谋事易成。", w: "财源自来，利在长线。", l: "对方情深，易遇良缘。", h: "正气升腾，宿疾痊愈。" }, "比和": { c: "同道相谋，平稳发展。", w: "财运平稳，诚实获利。", l: "志趣相投，沟通无碍。", h: "五行平衡，身心康泰。" }, "体克用": { c: "劳心劳力，成事在人。", w: "险中求财，波折结局。", l: "掌控欲强，宜多思考。", h: "元气消耗，防范疲累。" }, "体生用": { c: "虚耗过重，韬光养晦。", w: "钱财外泄，支出节制。", l: "付出无果，宜多自爱。", h: "精气偏弱，补益肾气。" }, "用克体": { c: "局势受困，宜守不进。", w: "求财受阻，严禁投机。", l: "缘分薄弱，沟通生隙。", h: "病邪侵扰，注意五脏。" } };
 
-    const statsUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
+    const baseUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
 
-    // 1. 获取数据的函数
-    async function refreshDisplay() {
-        try {
-            const res = await fetch(statsUrl);
-            const data = await res.json();
-            document.getElementById('countDisplay').innerText = data.count;
-        } catch (e) { console.log(e); }
+    // 修复方案：加入随机数后缀防止缓存
+    function getStat() {
+        const nocache = "?t=" + new Date().getTime();
+        fetch(baseUrl + nocache)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('countDisplay').innerText = data.count;
+            })
+            .catch(err => console.log("获取失败"));
     }
 
-    // 2. 增加数据的函数
-    async function addCount() {
-        try {
-            const res = await fetch(statsUrl + "/up");
-            const data = await res.json();
-            document.getElementById('countDisplay').innerText = data.count;
-        } catch (e) { console.log(e); }
+    function addStat() {
+        const nocache = "?t=" + new Date().getTime();
+        fetch(baseUrl + "/up" + nocache)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('countDisplay').innerText = data.count;
+            })
+            .catch(err => console.log("增加失败"));
     }
 
-    // 页面开启即刻运行一次
-    refreshDisplay();
-    // 1.5秒后再补一次，防止网络抖动
-    setTimeout(refreshDisplay, 1500);
+    // 初始化运行
+    getStat();
 
     function updateTime() {
         const now = new Date();
@@ -162,7 +163,7 @@
         const rawVal = document.getElementById('inputVal').value;
         if (!rawVal) { alert("请输入感应参数。"); return; }
         
-        addCount(); // 点击推演增加次数
+        addStat(); 
 
         const userNum = Number(rawVal);
         let textEnergy = 0;
@@ -202,18 +203,12 @@
             <div class="advice-item"><span class="advice-title">■ 钱财求利</span><div class="advice-content">${ctx.w}</div></div>
             <div class="advice-item"><span class="advice-title">■ 姻缘情感</span><div class="advice-content">${ctx.l}</div></div>
             <div class="advice-item"><span class="advice-title">■ 健康疾厄</span><div class="advice-content">${ctx.h}</div></div>`;
-        document.getElementById('processLog').innerHTML = `
-            <span style="color:#B59F7A; font-weight:bold; display:block; text-align:center;">全息路径推演</span>
-            <div class="math-block">
-                <span class="path-step">① 能量放大：演化 [${amplifiedNum}]</span>
-                <span class="path-step">② 体卦：【${ti}】(${eT}) | 用卦：【${yong}】(${eY})</span>
-                <span class="path-step">③ 动爻：第 ${mRaw} 爻动</span>
-            </div>`;
         document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
     };
 </script>
 </body>
 </html>
+
 
 
 
