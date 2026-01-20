@@ -57,7 +57,7 @@
 <div class="container">
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
-    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">1</span> 次 ——</div>
+    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">...</span> 次 ——</div>
     
     <div class="guide-box">
         <span class="guide-title">观象指引：</span>
@@ -113,17 +113,22 @@
 
     const baseUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
 
-    // 修复方案：加入随机数后缀防止缓存
+    // 核心感应逻辑
     function getStat() {
         const nocache = "?t=" + new Date().getTime();
         fetch(baseUrl + nocache)
             .then(res => res.json())
             .then(data => {
-                document.getElementById('countDisplay').innerText = data.count;
+                if(data && data.count) {
+                    document.getElementById('countDisplay').innerText = data.count;
+                }
             })
-            .catch(err => console.log("获取失败"));
+            .catch(err => {
+                document.getElementById('countDisplay').innerText = "--";
+            });
     }
 
+    // 增加计数
     function addStat() {
         const nocache = "?t=" + new Date().getTime();
         fetch(baseUrl + "/up" + nocache)
@@ -131,11 +136,13 @@
             .then(data => {
                 document.getElementById('countDisplay').innerText = data.count;
             })
-            .catch(err => console.log("增加失败"));
+            .catch(err => {});
     }
 
-    // 初始化运行
+    // 稳重的第一步：页面一加载立刻感应
     getStat();
+    // 稳重的第二步：如果网络稍慢，0.8秒后强制刷新一次
+    setTimeout(getStat, 800);
 
     function updateTime() {
         const now = new Date();
@@ -163,7 +170,7 @@
         const rawVal = document.getElementById('inputVal').value;
         if (!rawVal) { alert("请输入感应参数。"); return; }
         
-        addStat(); 
+        addStat(); // 只有点推演才累加
 
         const userNum = Number(rawVal);
         let textEnergy = 0;
