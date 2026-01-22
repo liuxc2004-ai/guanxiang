@@ -3,32 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>观象 - 灵敏度强化版 (v1.2.0)</title>
+    <title>观象 - 灵敏度强化版 (v1.2.1)</title>
     <style>
         :root { --body-bg: #FFFFFF; --paper-bg: #F5F2E9; --ink-black: #2D2926; --cinnabar: #8B0000; --border-old: #A6937C; }
         body { background-color: var(--body-bg); color: var(--ink-black); font-family: "STSong", "SimSun", serif; padding: 10px; display: flex; justify-content: center; margin: 0; }
         
-        /* 容器与适配 */
         .container { max-width: 850px; width: 100%; background-color: var(--paper-bg); padding: 50px; border: 1px solid var(--border-old); position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.1); box-sizing: border-box; }
         
-        /* 移动端响应式样式 */
+        /* 移动端响应式修正 */
         @media (max-width: 600px) {
             .container { padding: 30px 15px; }
             h1 { font-size: 1.8rem !important; letter-spacing: 8px !important; }
             .sensor-box, .input-row { grid-template-columns: 1fr !important; gap: 15px !important; }
             .gua-grid { grid-template-columns: 1fr !important; gap: 25px !important; }
             .advice-grid { grid-template-columns: 1fr !important; }
-            .disclaimer { top: 10px; right: 10px; font-size: 0.75rem; }
+            
+            /* 关键修正：为右侧悬浮文字留出 35px 的安全间距 */
+            .guide-box { padding-right: 35px !important; }
+            
+            .version-tag { left: 10px !important; top: 15px !important; font-size: 0.7rem !important; }
+            .disclaimer { right: 10px !important; top: 15px !important; font-size: 0.75rem !important; }
         }
          
         /* 左上角版本标识 */
         .version-tag { position: absolute; top: 25px; left: 30px; font-size: 0.8rem; color: #BBB; font-weight: bold; writing-mode: vertical-rl; padding-right: 10px; border-right: 1px solid var(--border-old); letter-spacing: 2px; }
         
-
+        /* 右上角免责声明 */
         .disclaimer { position: absolute; top: 25px; right: 30px; font-size: 0.9rem; color: #888; font-weight: bold; writing-mode: vertical-rl; padding-left: 10px; border-left: 1px solid var(--border-old); }
-        h1 { text-align: center; color: var(--cinnabar); font-size: 2.5rem; letter-spacing: 15px; margin: 0 0 10px 0; }
         
-        /* 累计感应显示 */
+        h1 { text-align: center; color: var(--cinnabar); font-size: 2.5rem; letter-spacing: 15px; margin: 0 0 10px 0; }
         .header-stats { text-align: center; font-size: 0.85rem; color: #A6937C; letter-spacing: 2px; margin-bottom: 25px; font-style: italic; min-height: 1.2em; }
         
         .guide-box { background: rgba(255, 255, 255, 0.4); border: 1px dashed var(--border-old); padding: 20px; margin-bottom: 30px; }
@@ -75,7 +78,7 @@
 <body>
 
 <div class="container">
-    <div class="version-tag">版本 v1.2.0</div>
+    <div class="version-tag">版本 v1.2.1</div>
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
     <div class="header-stats">—— 累计全息感应 <span id="countDisplay">...</span> 次 ——</div>
@@ -131,7 +134,6 @@
         <div class="advice-grid" id="adviceGrid"></div>
         <div class="process-log" id="processLog"></div>
     </div>
-    <div class="ver-tag">v1.2.0</div>
 </div>
 
 <script>
@@ -147,7 +149,6 @@
         "用克体": { career: ["局势受困，恐有压力或阻碍。宜守不宜进。"], wealth: ["求财受阻，严重者损财。严禁任何投机。"], love: ["缘分薄弱，沟通易生龃龉。小心外界干扰。"], health: ["病邪侵扰，防患未然。注意呼吸与五脏。"] }
     };
 
-    // 2. 云端计数逻辑
     const counterUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
     function syncHits() {
         fetch(counterUrl + "/up?t=" + Date.now())
@@ -163,7 +164,7 @@
                 document.getElementById('countDisplay').innerText = cached || "38";
             });
     }
-    syncHits(); // 页面加载即自动加1
+    syncHits();
 
     function updateTime() {
         const now = new Date();
@@ -198,7 +199,6 @@
             for(let i=0; i<userText.length; i++) textEnergy += userText.charCodeAt(i);
         }
 
-        // 3.28 灵敏度强化算法
         let amplifiedNum = (userNum * userNum) + (userNum * (userNum % 2 ? 7 : 13));
         let S = amplifiedNum + textEnergy;
 
@@ -254,5 +254,6 @@
 </script>
 </body>
 </html>
+
 
 
