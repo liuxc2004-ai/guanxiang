@@ -3,32 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>观象 - 灵敏度强化版 (v1.2.1)</title>
+    <title>观象 - 全息动态增强版 (v1.2.9)</title>
     <style>
         :root { --body-bg: #FFFFFF; --paper-bg: #F5F2E9; --ink-black: #2D2926; --cinnabar: #8B0000; --border-old: #A6937C; }
         body { background-color: var(--body-bg); color: var(--ink-black); font-family: "STSong", "SimSun", serif; padding: 10px; display: flex; justify-content: center; margin: 0; }
         
         .container { max-width: 850px; width: 100%; background-color: var(--paper-bg); padding: 50px; border: 1px solid var(--border-old); position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.1); box-sizing: border-box; }
         
-        /* 移动端响应式修正 */
         @media (max-width: 600px) {
             .container { padding: 30px 15px; }
             h1 { font-size: 1.8rem !important; letter-spacing: 8px !important; }
             .sensor-box, .input-row { grid-template-columns: 1fr !important; gap: 15px !important; }
             .gua-grid { grid-template-columns: 1fr !important; gap: 25px !important; }
             .advice-grid { grid-template-columns: 1fr !important; }
-            
-            /* 关键修正：为右侧悬浮文字留出 35px 的安全间距 */
             .guide-box { padding-right: 35px !important; }
-            
             .version-tag { left: 10px !important; top: 15px !important; font-size: 0.7rem !important; }
             .disclaimer { right: 10px !important; top: 15px !important; font-size: 0.75rem !important; }
         }
          
-        /* 左上角版本标识 */
         .version-tag { position: absolute; top: 25px; left: 30px; font-size: 0.8rem; color: #BBB; font-weight: bold; writing-mode: vertical-rl; padding-right: 10px; border-right: 1px solid var(--border-old); letter-spacing: 2px; }
-        
-        /* 右上角免责声明 */
         .disclaimer { position: absolute; top: 25px; right: 30px; font-size: 0.9rem; color: #888; font-weight: bold; writing-mode: vertical-rl; padding-left: 10px; border-left: 1px solid var(--border-old); }
         
         h1 { text-align: center; color: var(--cinnabar); font-size: 2.5rem; letter-spacing: 15px; margin: 0 0 10px 0; }
@@ -50,7 +43,7 @@
         button#btnRun:active { transform: translateY(2px); box-shadow: 0 2px 0 #600; }
 
         #result { display: none; margin-top: 40px; border-top: 2px solid var(--cinnabar); padding-top: 30px; }
-        .luck-tag { text-align: center; font-size: 1.5rem; font-weight: bold; color: var(--cinnabar); letter-spacing: 6px; margin-bottom: 30px; }
+        .luck-tag { text-align: center; font-size: 1.5rem; font-weight: bold; color: var(--cinnabar); letter-spacing: 6px; margin-bottom: 30px; line-height: 1.5; }
         
         .gua-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         .gua-item { text-align: center; }
@@ -72,13 +65,12 @@
         .process-log { background: #1a1816; color: #B59F7A; padding: 25px; font-size: 0.85rem; line-height: 1.8; margin-top: 20px; border-radius: 4px; }
         .math-block { background: #262422; border-left: 4px solid var(--cinnabar); padding: 15px; margin-top: 12px; font-family: "Courier New", Courier, monospace; }
         .path-step { border-bottom: 1px solid #3d3a36; padding: 5px 0; display: block; }
-        .ver-tag { position: absolute; bottom: 10px; right: 15px; font-size: 0.6rem; color: #CCC; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="version-tag">版本 v1.2.1</div>
+    <div class="version-tag">版本 v1.2.9</div>
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
     <div class="header-stats">—— 累计全息感应 <span id="countDisplay">...</span> 次 ——</div>
@@ -87,7 +79,7 @@
         <span class="guide-title">观象指引：</span>
         <div class="guide-content">
             1. 静心：深呼吸三次，在心中默念你想要推测的事情。<br>
-            2. <span class="must">【必填】感应参数</span>：1-100间的直觉数字（微调即产生显著卦变）。<br>
+            2. <span class="must">【必填】感应参数</span>：1-100间的直觉数字。<br>
             3. 【选填】物感描述：输入景物描述可叠加能量扰动。<br>
             4. 【选填】时空校对：手动修正或由系统感应。
         </div>
@@ -118,7 +110,7 @@
             <option value="0">未知/正中</option><option value="1">南-离</option><option value="2">西南-坤</option><option value="3">西-兑</option><option value="4">西北-乾</option><option value="5">北-坎</option><option value="6">东北-艮</option><option value="7">东-震</option><option value="8">东南-巽</option>
         </select></div>
         <div><label>时辰校正</label><select id="timeSelect">
-            <option value="0">自动抓取</option><option value="1">子时(23:00-1:00)</option><option value="2">丑时(1:00-3:00)</option><option value="3">寅时(3:00-5:00)</option><option value="4">卯时(5:00-7:00)</option><option value="5">辰时(7:00-9:00)</option><option value="6">巳时(9:00-11:00)</option><option value="7">午时(11:00-13:00)</option><option value="8">未时(13:00-15:00)</option><option value="9">申时(15:00-17:00)</option><option value="10">酉时(17:00-19:00)</option><option value="11">戌时(19:00-21:00)</option><option value="12">亥时(21:00-23:00)</option>
+            <option value="0">自动抓取</option><option value="1">子时</option><option value="2">丑时</option><option value="3">寅时</option><option value="4">卯时</option><option value="5">辰时</option><option value="6">巳时</option><option value="7">午时</option><option value="8">未时</option><option value="9">申时</option><option value="10">酉时</option><option value="11">戌时</option><option value="12">亥时</option>
         </select></div>
     </div>
     
@@ -141,28 +133,31 @@
     const GUA_LIST = ["坤", "乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
     const DI_ZHI = ["", "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
     const DIR_VAL = [0, 3, 8, 2, 1, 6, 7, 4, 5];
-    const JUDGMENTS = {
-        "用生体": { career: ["贵人垂青，谋事易成。此时宜积极进取，大有可为。"], wealth: ["财源自来，无需苦求。利在长线规划。"], love: ["对方情深意重，琴瑟和鸣，单身者易遇良缘。"], health: ["正气升腾，宿疾有痊愈之机。"] },
-        "比和": { career: ["同道相谋，平稳发展。团队协作能保万全。"], wealth: ["财运平稳，细水流长。凭诚实劳作获利。"], love: ["志趣相投，沟通无碍。关系平淡而真实。"], health: ["五行平衡，身心康泰。建议维持当前节奏。"] },
-        "体克用": { career: ["劳心劳力，成事在人。凭毅力终能掌控局面。"], wealth: ["利在险中求，求财波折但结局尚可。"], love: ["掌控欲较强，宜多换位思考，避免摩擦。"], health: ["元气消耗快，注意劳逸结合，谨防疲累。"] },
-        "体生用": { career: ["虚耗过重，为他人作嫁衣。建议韬光养晦。"], wealth: ["钱财外泄，防范虚诈。支出宜节制。"], love: ["付出难获对等回应，易生卑微感，宜自爱。"], health: ["精气神偏弱，易感疲劳。建议补益肾气。"] },
-        "用克体": { career: ["局势受困，恐有压力或阻碍。宜守不宜进。"], wealth: ["求财受阻，严重者损财。严禁任何投机。"], love: ["缘分薄弱，沟通易生龃龉。小心外界干扰。"], health: ["病邪侵扰，防患未然。注意呼吸与五脏。"] }
+
+    const GUA_NAME_MAP = {
+        "离艮": "火山旅", "乾艮": "天山遁", "兑坤": "泽地萃", "震离": "雷火丰", "坎巽": "水风井", "坤震": "地雷复", "艮兑": "山泽损", "巽坎": "风水涣", "离乾": "火天大有", "乾离": "天火同人"
     };
 
-    const counterUrl = "https://api.counterapi.dev/v1/guanxiang/hits";
+    const JUDGMENTS_PRO = {
+        "用生体": { tag: "亨", desc: "大吉。外力相助，顺水推舟。" },
+        "比和": { tag: "贞", desc: "中吉。内外一致，平稳推进。" },
+        "体克用": { tag: "利", desc: "小吉。克难成事，劳而有获。" },
+        "体生用": { tag: "耗", desc: "平。付出过大，宜韬光养晦。" },
+        "用克体": { tag: "厉", desc: "凶。压力临头，宜守不宜进。" }
+    };
+
+    const JUDGMENTS = {
+        "用生体": { career: ["贵人垂青，谋事易成。宜积极进取。"], wealth: ["财源自来，无需苦求。"], love: ["对方情深意重，琴瑟和鸣。"], health: ["正气升腾，宿疾有痊愈之机。"] },
+        "比和": { career: ["同道相谋，平稳发展。协作保万全。"], wealth: ["财运平稳，细水流长。"], love: ["志趣相投，沟通无碍。"], health: ["五行平衡，身心康泰。"] },
+        "体克用": { career: ["劳心劳力，凭毅力终能掌控局面。"], wealth: ["利在险中求，波折但结局尚可。"], love: ["掌控欲较强，宜多换位思考。"], health: ["元气消耗快，注意劳逸结合。"] },
+        "体生用": { career: ["虚耗过重，为他人作嫁衣。建议守成。"], wealth: ["钱财外泄，防范虚诈。"], love: ["付出难获对等回应，宜自爱。"], health: ["精气神偏弱，建议补益。"] },
+        "用克体": { career: ["局势受困，阻碍重重。宜守不宜进。"], wealth: ["求财受阻，严禁投机。"], love: ["缘分薄弱，沟通易生龃龉。"], health: ["病邪侵扰，防患未然。"] }
+    };
+
     function syncHits() {
-        fetch(counterUrl + "/up?t=" + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                if(data.count) {
-                    document.getElementById('countDisplay').innerText = data.count;
-                    localStorage.setItem('cached_hits', data.count);
-                }
-            })
-            .catch(() => {
-                const cached = localStorage.getItem('cached_hits');
-                document.getElementById('countDisplay').innerText = cached || "38";
-            });
+        fetch("https://api.counterapi.dev/v1/guanxiang/hits/up").then(res => res.json()).then(data => {
+            if(data.count) document.getElementById('countDisplay').innerText = data.count;
+        }).catch(() => document.getElementById('countDisplay').innerText = "108");
     }
     syncHits();
 
@@ -189,27 +184,23 @@
     }
 
     document.getElementById('btnRun').onclick = function() {
+        // --- 1. 基础数据计算 (保持 1.2.5 版本的严谨性) ---
         const rawVal = document.getElementById('inputVal').value;
-        if (!rawVal || isNaN(parseInt(rawVal))) { alert("请先输入感应数字。"); return; }
-        
+        if (!rawVal) { alert("请先输入感应数字。"); return; }
         const userNum = Number(rawVal);
         let textEnergy = 0;
         const userText = (document.getElementById('soundN').value || "").trim();
-        if(userText.length > 0) {
-            for(let i=0; i<userText.length; i++) textEnergy += userText.charCodeAt(i);
-        }
+        for(let i=0; i<userText.length; i++) textEnergy += userText.charCodeAt(i);
 
         let amplifiedNum = (userNum * userNum) + (userNum * (userNum % 2 ? 7 : 13));
         let S = amplifiedNum + textEnergy;
-
         const P = parseInt(document.getElementById('personS').value) || 0;
         const L = parseInt(DIR_VAL[document.getElementById('direction').value]) || 0;
         const T = parseInt(document.getElementById('timeSelect').value) || currentAutoZhi;
 
         let upIdx = P > 0 ? P : (S % 8 || 8);
         let downIdx = ((S + T + L) % 8) || 8;
-        let mRaw = ((S + T + L) % 6) || 6; 
-        let mIdx = mRaw - 1;
+        let mIdx = (((S + T + L) % 6) || 6) - 1;
 
         const ti = GUA_LIST[upIdx], yong = GUA_LIST[downIdx];
         const ben = [...GUA_DATA[yong].slice(0,3), ...GUA_DATA[ti].slice(0,3)];
@@ -219,41 +210,56 @@
         let bian = [...ben]; bian[mIdx] = (ben[mIdx] === 1 ? 0 : 1);
         const yB = safeGet(bian.slice(0,3)), tB = safeGet(bian.slice(3,6));
 
+        // --- 2. 卦名与格局判定 ---
+        const nameBen = GUA_NAME_MAP[ti + yong] || (ti + yong);
+        const nameHu = GUA_NAME_MAP[huU + huD] || (huU + huD);
+        const nameBian = GUA_NAME_MAP[tB + yB] || (tB + yB);
+        const rules = {"木":{"生":"火","克":"土"},"火":{"生":"土","克":"金"},"土":{"生":"金","克":"水"},"金":{"生":"水","克":"木"},"水":{"生":"木","克":"火"}};
+        const getRel = (t, y) => (t===y)?"比和":(rules[y]?.生===t?"用生体":(rules[y]?.克===t?"用克体":(rules[t]?.生===y?"体生用":"体克用")));
+        let relBen = getRel(ti, yong);
+        const pInfo = JUDGMENTS_PRO[relBen];
+        const ctx = JUDGMENTS[relBen];
+
+        // --- 3. 深度缝合：全流程逻辑注入 ---
+        // 事业：本卦看象，互卦看变数
+        const careerFinal = `${ctx.career[0]} 此事起于[${nameBen}]之象，中途受[${nameHu}]干扰，务必保持定力，方能达成[${nameBian}]之终局。`;
+        
+        // 钱财：以变卦为归宿
+        const wealthFinal = `财气自[${nameBen}]萌发，${ctx.wealth[0]} 过程见[${nameHu}]之虚耗或转机，利在[${nameBian}]所指之方。`;
+        
+        // 姻缘：【新增融合】现状、纠葛、归宿
+        const loveFinal = `情缘现状如[${nameBen}]般${GUA_DATA[ti][5].split('，')[0]}。${ctx.love[0]} 虽有[${nameHu}]之纠缠或隐忧，然终将落定于[${nameBian}]，宜顺应天时。`;
+        
+        // 健康：【新增融合】病机与预后
+        const healthFinal = `当下体察[${nameBen}]之气，${GUA_DATA[ti][4]}象偏旺。${ctx.health[0]} 注意[${nameHu}]提示的隐性病灶，预后则看[${nameBian}]之平衡。`;
+
+        // --- 4. 渲染界面 ---
         document.getElementById('result').style.display = 'block';
         renderGua('guaBen', ben, mIdx); renderGua('guaHu', hu); renderGua('guaBian', bian);
-        document.getElementById('nameBen').innerText = ti + yong;
-        document.getElementById('nameHu').innerText = huU + huD;
-        document.getElementById('nameBian').innerText = tB + yB;
-        document.getElementById('meanBen').innerText = GUA_DATA[ti][5] + " | " + GUA_DATA[yong][5];
-        document.getElementById('meanHu').innerText = GUA_DATA[huU][5] + " | " + GUA_DATA[huD][5];
-        document.getElementById('meanBian').innerText = GUA_DATA[tB][5] + " | " + GUA_DATA[yB][5];
+        document.getElementById('nameBen').innerText = nameBen;
+        document.getElementById('nameHu').innerText = nameHu;
+        document.getElementById('nameBian').innerText = nameBian;
+        document.getElementById('meanBen').innerText = GUA_DATA[ti][5];
+        document.getElementById('meanHu').innerText = GUA_DATA[huU][5];
+        document.getElementById('meanBian').innerText = GUA_DATA[tB][5];
 
-        const rules = {"木":{"生":"火","克":"土"},"火":{"生":"土","克":"金"},"土":{"生":"金","克":"水"},"金":{"生":"水","克":"木"},"水":{"生":"木","克":"火"}};
-        const eT = GUA_DATA[ti][3], eY = GUA_DATA[yong][3];
-        let rel = (ti===yong)?"比和":(rules[eY]?.生===eT?"用生体":(rules[eY]?.克===eT?"用克体":(rules[eT]?.生===eY?"体生用":"体克用")));
+        document.getElementById('luckTag').innerHTML = `断曰：[${nameBen}] · <span style="color:var(--cinnabar)">${pInfo.tag}</span><br><small style="font-weight:normal;color:#666;">${pInfo.desc}</small>`;
 
-        document.getElementById('luckTag').innerText = "断曰：此卦为大" + ((rel.includes("生")||rel==="比和")?"吉":"平") + "之兆";
-        const ctx = JUDGMENTS[rel];
         document.getElementById('adviceGrid').innerHTML = `
-            <div class="advice-item"><span class="advice-title">■ 事业功名</span><div>${ctx.career[0]}</div></div>
-            <div class="advice-item"><span class="advice-title">■ 钱财求利</span><div>${ctx.wealth[0]}</div></div>
-            <div class="advice-item"><span class="advice-title">■ 姻缘情感</span><div>${ctx.love[0]}</div></div>
-            <div class="advice-item"><span class="advice-title">■ 健康疾厄</span><div>${ctx.health[0]}</div></div>`;
+            <div class="advice-item"><span class="advice-title">■ 事业功名</span><div>${careerFinal}</div></div>
+            <div class="advice-item"><span class="advice-title">■ 钱财求利</span><div>${wealthFinal}</div></div>
+            <div class="advice-item"><span class="advice-title">■ 姻缘情感</span><div>${loveFinal}</div></div>
+            <div class="advice-item"><span class="advice-title">■ 健康疾厄</span><div>${healthFinal}</div></div>`;
 
         document.getElementById('processLog').innerHTML = `
-            <span style="color:#B59F7A; font-weight:bold; display:block; text-align:center;">全息路径推演 (梅花灵敏度优化版)</span>
+            <span style="color:#B59F7A; font-weight:bold; display:block; text-align:center;">全息路径推演 (v1.2.9 缝合增强版)</span>
             <div class="math-block">
-                <span class="path-step">① 能量放大：输入[${userNum}] → 经混沌算力放大为 [${amplifiedNum}]</span>
-                <span class="path-step">② 能量源：放大值 + 物感感应[${textEnergy}] → 基数(S): ${S}</span>
-                <span class="path-step">③ 起上卦(体)：${P ? '【见相锁定】' : '【灵敏推导 S % 8】'} → 【${ti}】(五行:${eT})</span>
-                <span class="path-step">④ 起下卦(用)：(S + T[${DI_ZHI[T]}] + L[${L}]) % 8 → 【${yong}】(五行:${eY})</span>
-                <span class="path-step">⑤ 论格局：体卦[${eT}] 与 用卦[${eY}] 呈【${rel}】之势。</span>
+                <span class="path-step">① 初始能量：基数 S = ${S}</span>
+                <span class="path-step">② 动态演化：[${nameBen}] (初) ➔ [${nameHu}] (中) ➔ [${nameBian}] (终)</span>
+                <span class="path-step">③ 五行定格：体卦【${ti}】(${GUA_DATA[ti][3]}) 对 用卦【${yong}】(${GUA_DATA[yong][3]})，呈【${relBen}】之势。</span>
             </div>`;
         document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
     };
 </script>
 </body>
 </html>
-
-
-
