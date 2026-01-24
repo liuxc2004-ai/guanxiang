@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>观象 - 全息动态增强版 (v1.2.9)</title>
+    <title>观象 - 全息动态增强版 (v1.3.0)</title>
     <style>
         :root { --body-bg: #FFFFFF; --paper-bg: #F5F2E9; --ink-black: #2D2926; --cinnabar: #8B0000; --border-old: #A6937C; }
         body { background-color: var(--body-bg); color: var(--ink-black); font-family: "STSong", "SimSun", serif; padding: 10px; display: flex; justify-content: center; margin: 0; }
@@ -70,11 +70,10 @@
 <body>
 
 <div class="container">
-    <div class="version-tag">版本 v1.2.9</div>
+    <div class="version-tag">版本 v1.3.0 </div>
     <div class="disclaimer">梅花易数·观象推演·纯属娱乐·相信科学</div>
     <h1>观象</h1>
-    <div class="header-stats">—— 累计全息感应 <span id="countDisplay">...</span> 次 ——</div>
-    
+        
     <div class="guide-box">
         <span class="guide-title">观象指引：</span>
         <div class="guide-content">
@@ -154,12 +153,7 @@
         "用克体": { career: ["局势受困，阻碍重重。宜守不宜进。"], wealth: ["求财受阻，严禁投机。"], love: ["缘分薄弱，沟通易生龃龉。"], health: ["病邪侵扰，防患未然。"] }
     };
 
-    function syncHits() {
-        fetch("https://api.counterapi.dev/v1/guanxiang/hits/up").then(res => res.json()).then(data => {
-            if(data.count) document.getElementById('countDisplay').innerText = data.count;
-        }).catch(() => document.getElementById('countDisplay').innerText = "108");
-    }
-    syncHits();
+   
 
     function updateTime() {
         const now = new Date();
